@@ -1,0 +1,21 @@
+stages :
+  - build_and_push
+
+variables:
+  ECR_REPO_URL: "590183695546.dkr.ecr.ap-south-1.amazonaws.com/my-first-ecr-repo"
+  AWS_REGION: "ap-south-1"
+
+build_push_job:
+  stage: build_and_push
+  tags:
+    - ec2-runner
+  
+  script:
+    - echo "Starting the build..."
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
+    - docker build -t $ECR_REPO_URL:$CI_COMMIT_SHORT_SHA .
+    - docker tag $ECR_REPO_URL:$CI_COMMIT_SHORT_SHA $ECR_REPO_URL:latest
+    - docker push $ECR_REPO_URL:$CI_COMMIT_SHORT_SHA
+    - docker push $ECR_REPO_URL:latest
+    - echo "Image Pushed! Build complete..."
+  

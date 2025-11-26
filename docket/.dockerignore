@@ -1,0 +1,15 @@
+# Ignore Git files
+.git
+.gitignore
+
+# Ignore Python junk
+__pycache__
+*.pyc
+venv/
+.env
+
+# CRITICAL: Ignore Terraform infrastructure code
+terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
