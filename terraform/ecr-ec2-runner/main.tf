@@ -91,11 +91,12 @@ resource "aws_instance" "runner-talendjob" {
       --url "https://gitlab.com/" \
       --token "${var.gitlab_runner_token}" \
       --executor "shell" \
+      --tag-list "ec2-runner" \
       --description "Auto-Terraform-Runner"
 
     gitlab-runner start
   EOF
-  
+
 tags = {
     Name = "GitLab-Runner-Box"
   }
