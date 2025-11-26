@@ -2,6 +2,12 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+variable "gitlab_runner_token" {
+  description = "The runner authentication token from GitLab"
+  type        = string
+  default     = "glrt-LwStzuJuxfjE0aBUr6U9r286MQpwOjE5Z254MQp0OjMKdTpkaG5qaRg.01.1j1h15o6q" 
+}
+
 resource "aws_ecr_repository" "my-first-ecr-repo" {
   name = "my-first-ecr-repo"
   image_tag_mutability = "MUTABLE"
@@ -66,6 +72,24 @@ resource "aws_instance" "runner-talendjob" {
             systemctl start docker
             systemctl enable docker
             usermod -aG docker ec2-user
+
+            curl -L "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64" -o /usr/local/bin/gitlab-runner
+            chmod +x /usr/local/bin/gitlab-runner
+
+            useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+
+            gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+
+            gitlab-runner register \
+                  --non-interactive \
+                  --url "https://gitlab.com/" \
+                  --token "${var.gitlab_runner_token}" \
+                  --executor "shell" \
+                  --description "Auto-Terraform-Runner"
+
+            gitlab-runner start
+
+            usermod -aG docker gitlab-runner
             EOF
 tags = {
     Name = "GitLab-Runner-Box"
