@@ -78,6 +78,8 @@ resource "aws_instance" "runner-talendjob" {
 
             useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
 
+            rm /home/gitlab-runner/.bash_logout
+
             gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
 
             gitlab-runner register \
