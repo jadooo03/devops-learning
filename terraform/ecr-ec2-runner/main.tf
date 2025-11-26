@@ -66,33 +66,36 @@ resource "aws_instance" "runner-talendjob" {
   iam_instance_profile = aws_iam_instance_profile.ec2-instance-profile.name
   key_name = "ayush-bourai"
   user_data = <<-EOF
-            #!/bin/bash
-            apt-get update -y
-            apt-get install -y docker.io awscli
-            systemctl start docker
-            systemctl enable docker
-            usermod -aG docker ec2-user
+            user_data = <<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y docker.io awscli
+    systemctl start docker
+    systemctl enable docker
+    
+    usermod -aG docker ubuntu
 
-            curl -L "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64" -o /usr/local/bin/gitlab-runner
-            chmod +x /usr/local/bin/gitlab-runner
+    curl -L "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64" -o /usr/local/bin/gitlab-runner
+    chmod +x /usr/local/bin/gitlab-runner
 
-            useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+    useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
 
-            rm /home/gitlab-runner/.bash_logout
+    rm /home/gitlab-runner/.bash_logout
+    
+    usermod -aG docker gitlab-runner
 
-            gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+    gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
 
-            gitlab-runner register \
-                  --non-interactive \
-                  --url "https://gitlab.com/" \
-                  --token "${var.gitlab_runner_token}" \
-                  --executor "shell" \
-                  --description "Auto-Terraform-Runner"
+    gitlab-runner register \
+      --non-interactive \
+      --url "https://gitlab.com/" \
+      --token "${var.gitlab_runner_token}" \
+      --executor "shell" \
+      --description "Auto-Terraform-Runner"
 
-            gitlab-runner start
-
-            usermod -aG docker gitlab-runner
-            EOF
+    gitlab-runner start
+  EOF
+  
 tags = {
     Name = "GitLab-Runner-Box"
   }
