@@ -66,7 +66,6 @@ resource "aws_instance" "runner-talendjob" {
   iam_instance_profile = aws_iam_instance_profile.ec2-instance-profile.name
   key_name = "ayush-bourai"
   user_data = <<-EOF
-            user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
     apt-get install -y docker.io awscli
