@@ -68,10 +68,11 @@ resource "aws_instance" "runner-talendjob" {
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
-    apt-get install -y docker.io awscli
+    apt-get install -y docker.io 
+    apt-get install -y awscli || echo "AWS CLI failed but continuing..."
+    
     systemctl start docker
     systemctl enable docker
-    
     usermod -aG docker ubuntu
 
     curl -L "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64" -o /usr/local/bin/gitlab-runner
@@ -90,8 +91,6 @@ resource "aws_instance" "runner-talendjob" {
       --url "https://gitlab.com/" \
       --token "${var.gitlab_runner_token}" \
       --executor "shell" \
-      --tag-list "ec2-runner" \
-      --description "Auto-Terraform-Runner"
 
     gitlab-runner start
   EOF
