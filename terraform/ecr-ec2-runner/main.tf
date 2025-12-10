@@ -11,6 +11,7 @@ variable "gitlab_runner_token" {
 resource "aws_ecr_repository" "my-first-ecr-repo" {
   name = "my-first-ecr-repo"
   image_tag_mutability = "MUTABLE"
+  force_delete = true
   image_scanning_configuration {
     scan_on_push = true
   }
